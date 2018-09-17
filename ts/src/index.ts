@@ -1,3 +1,7 @@
-import geoByIP from "./geoByIP";
+import GeoByIP from "./geoByIP";
+import pipeline from "./pipeline";
 
-export default geoByIP;
+export {
+  GeoByIP,
+  pipeline
+};

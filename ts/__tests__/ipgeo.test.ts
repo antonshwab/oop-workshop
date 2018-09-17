@@ -1,5 +1,5 @@
 import * as nock from "nock";
-import GeoByIP from "../src";
+import { GeoByIP } from "../src";
 import { IClient, IResponse } from "../src/geoByIP/Client";
 
 describe("Geo by IP", () => {
