@@ -1,3 +1,3 @@
-import half from "./half";
+import geoByIP from "./geoByIP";
 
-export default half;
+export default geoByIP;
