@@ -28,7 +28,7 @@ describe("Geo by IP", () => {
 
   it("test with DI", async () => {
 
-    class Client extends IClient {
+    class Client implements IClient {
       public async request(url: string): Promise<IResponse> {
         const response = {
           "as": "AS20852 Velcom AZS LLC",
