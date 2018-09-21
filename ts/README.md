@@ -1,11 +1,11 @@
 
 # Table of Contents
 
-1.  [Get geo location by IP](#orgb172793)
-2.  [Ger forecast for city](#org2721c56)
+1.  [Get geo location by IP](#org328d8a3)
+2.  [Ger forecast for city](#orga030c9d)
 
 
-<a id="orgb172793"></a>
+<a id="org328d8a3"></a>
 
 # Get geo location by IP
 
@@ -14,13 +14,12 @@
     console.log(response.city);
 
 
-<a id="org2721c56"></a>
+<a id="orga030c9d"></a>
 
 # Ger forecast for city
 
 
     const weather = new Weather();
-
 
     // forecast from one service
     const forecast1 = await weather.getForecast("barcelona", "MetaWeather");
@@ -39,4 +38,8 @@
     2.  add new service from outside
     3.  Add DI tests
     4.  make CLI interface
-    5.  maybe make conversion to IForecastResponse from other services's response formats
+    5.  <del>make conversion to general IForecastResponse from other services's response formats</del>
+        remove IForecastResponse, use json string or any.
+        weather.getForecast("asdf", "servicename") -&#x2014;> json string
+        because different services may have different formats
+    6.  use defferent weather services
