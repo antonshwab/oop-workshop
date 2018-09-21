@@ -1,3 +1,5 @@
+import fetch from "node-fetch";
+
 interface IConsolidatedWeather {
   "id": number;
   "weather_state_name": string;

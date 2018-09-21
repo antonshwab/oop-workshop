@@ -1,37 +1,46 @@
-import fs from "fs";
-import nock from "nock";
-import { Weather } from "../src";
-import { IClient, IResponse } from "../src/geoByIP/Client";
+import * as fs from "fs";
+import * as nock from "nock";
+import { IForecastResponse, Weather } from "../src/weather";
 
 describe("Weather", async () => {
-  nock.desableNetConnect();
+  nock.disableNetConnect();
 
-  const barcelonaLocationJSON = await fs.readFile('__dirname/__fixtures__/locationResponse.json', 'utf8').toString();
+  const barcelonaLocationJSON = fs.readFileSync(`${__dirname}/__fixtures__/locationResponse.json`, 'utf8').toString();
 
-  const barcelonaForecastJSON = await fs.readFile('__dirname/__fixtures__/forecastResponse.json', 'utf8').toString();
+  const barcelonaForecastJSON = fs.readFileSync(`${__dirname}/__fixtures__/forecastResponse.json`, 'utf8').toString();
 
-  const nockBarcelonaLocationJSON = () => barcelonaLocationJSON;
-  const nockBarcelonaForecastResponse = () => barcelonaForecastJSON;
-
-  nock(`https://www.metaweather.com/api/location`)
-    .get(`/search/?query=barcelona`)
-    .reply(200, nockBarcelonaLocationJSON);
-
-  nock(`https://www.metaweather.com/api/location`)
-    .get(`/753692/`)
-    .reply(200, nockBarcelonaForecastResponse);
 
   it("test with nock", async () => {
 
     const expectedForecast: IForecastResponse = JSON.parse(barcelonaForecastJSON) as IForecastResponse;
 
     const weather = new Weather();
-    const forecast = await weather.getForecast("barcelona", "MetaWeather");
-    expect(forecast).toBe(expectedForecast);
 
-    // test second service
+    nock(`https://www.metaweather.com/api/location`)
+      .get(`/search/?query=barcelona`)
+      .reply(200, barcelonaLocationJSON);
+
+    nock(`https://www.metaweather.com/api/location`)
+      .get(`/753692`)
+      .reply(200, barcelonaForecastJSON);
+
+    const forecast1 = await weather.getForecast("barcelona", "MetaWeather");
+    expect(forecast1).toEqual(expectedForecast);
+
+
+    nock(`https://www.metaweather.com/api/location`)
+      .get(`/search/?query=barcelona`)
+      .reply(200, barcelonaLocationJSON);
+
+    nock(`https://www.metaweather.com/api/location`)
+      .get(`/753692`)
+      .reply(200, barcelonaForecastJSON);
+
+    const forecast2 = await weather.getForecast("barcelona", "MegaWeather");
+    expect(forecast2).toEqual(expectedForecast);
   });
 
+  // TODO:
   // it("test with DI", () => {
   // class Client implements IClient {
   //   public async request(city: string): Promise<IResponse> {
@@ -43,4 +52,6 @@ describe("Weather", async () => {
   // }
   // });
 
+
+  // TODO: test it with inversifyTS
 });

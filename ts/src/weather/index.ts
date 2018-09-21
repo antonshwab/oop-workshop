@@ -1,3 +1,4 @@
-import { Weather } from "..";
+import { IForecastResponse } from "./io";
+import Weather from "./Weather";
 
-export { Weather };
+export { Weather, IForecastResponse, };
