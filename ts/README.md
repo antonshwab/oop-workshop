@@ -1,11 +1,11 @@
 
 # Table of Contents
 
-1.  [Get geo location by IP](#org4245ebb)
-2.  [Ger forecast for city](#org6199fee)
+1.  [Get geo location by IP](#orgb172793)
+2.  [Ger forecast for city](#org2721c56)
 
 
-<a id="org4245ebb"></a>
+<a id="orgb172793"></a>
 
 # Get geo location by IP
 
@@ -14,7 +14,7 @@
     console.log(response.city);
 
 
-<a id="org6199fee"></a>
+<a id="org2721c56"></a>
 
 # Ger forecast for city
 
@@ -37,3 +37,6 @@
 -   TODO:
     1.  get forecast with default service
     2.  add new service from outside
+    3.  Add DI tests
+    4.  make CLI interface
+    5.  maybe make conversion to IForecastResponse from other services's response formats
