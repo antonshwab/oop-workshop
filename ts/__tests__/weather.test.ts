@@ -1,6 +1,9 @@
 import * as fs from "fs";
 import * as nock from "nock";
-import { IForecastResponse, Weather } from "../src/weather";
+import { Weather } from "../src/weather";
+import { IService } from "../src/weather/Service";
+import { Request } from "../src/weather/io";
+import { MetaWeather } from "../src/weather/MetaWeatherService";
 
 describe("Weather", async () => {
   nock.disableNetConnect();
@@ -9,10 +12,12 @@ describe("Weather", async () => {
 
   const barcelonaForecastJSON = fs.readFileSync(`${__dirname}/__fixtures__/forecastResponse.json`, 'utf8').toString();
 
+  const barcelonaOpenWeatherForecastJSON = fs.readFileSync(`${__dirname}/__fixtures__/forecastResponse.json`, "utf8").toString();
 
   it("test with nock", async () => {
 
-    const expectedForecast: IForecastResponse = JSON.parse(barcelonaForecastJSON) as IForecastResponse;
+    const expectedMetaWeatherForecast = JSON.parse(barcelonaForecastJSON);
+    const expectedMegaWeatherForecast = expectedMetaWeatherForecast;
 
     const weather = new Weather();
 
@@ -22,10 +27,10 @@ describe("Weather", async () => {
 
     nock(`https://www.metaweather.com/api/location`)
       .get(`/753692`)
-      .reply(200, barcelonaForecastJSON);
+      .reply(200, barcelonaForecastJSON, { 'Content-Type': 'application/json' });
 
-    const forecast1 = await weather.getForecast("barcelona", "MetaWeather");
-    expect(forecast1).toEqual(expectedForecast);
+    const forecast1 = await weather.getForecast("barcelona");
+    expect(forecast1).toEqual(expectedMetaWeatherForecast);
 
 
     nock(`https://www.metaweather.com/api/location`)
@@ -37,21 +42,55 @@ describe("Weather", async () => {
       .reply(200, barcelonaForecastJSON);
 
     const forecast2 = await weather.getForecast("barcelona", "MegaWeather");
-    expect(forecast2).toEqual(expectedForecast);
+    expect(forecast2).toEqual(expectedMegaWeatherForecast);
   });
 
-  // TODO:
-  // it("test with DI", () => {
-  // class Client implements IClient {
-  //   public async request(city: string): Promise<IResponse> {
-  //     const response = {
-  //     } as IResponse;
+  it("add service", async () => {
+    const expectedOpenWeatherForecast = JSON.parse(barcelonaOpenWeatherForecastJSON);
+    const appID = "8e3e3073408dd6ddd936d1e148e2f986";
+    const city = "barcelona";
+    nock(`https://api.openweathermap.org/data/2.5`)
+      .get(`/forecast?q=${city}&appid=${appID}`)
+      .reply(200, expectedOpenWeatherForecast);
 
-  //     return new Promise(resolve => resolve(response));
-  //   }
-  // }
-  // });
+    class OpenWeatherMap implements IService {
+      public static serviceName: string = "OpenWeatherMap";
+
+      public async getForecast(city: string, request: Request): Promise<any> {
+        const appID = "8e3e3073408dd6ddd936d1e148e2f986";
+        const apiURL = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${appID}`;
+        const forecast = await request(apiURL);
+        return forecast;
+      }
+    }
+
+    const services = {
+      [OpenWeatherMap.serviceName]: () => new OpenWeatherMap()
+    };
+
+    const weather = new Weather(services);
+    const forecast3 = await weather.getForecast(city, "OpenWeatherMap");
+    expect(forecast3).toEqual(expectedOpenWeatherForecast);
+  });
+
+  it("test with simple DI", async () => {
+
+    const expectedMetaWeatherForecast = JSON.parse(barcelonaForecastJSON);
+
+    const weather = new Weather();
+    const request: Request = async (url: string) => {
+      if (url === `https://www.metaweather.com/api/location/search/?query=barcelona`) {
+        return JSON.parse(barcelonaLocationJSON);
+      }
+      if (url === `https://www.metaweather.com/api/location/753692`) {
+        return expectedMetaWeatherForecast;
+      }
+    };
+
+    const forecast = await weather.getForecast("barcelona", "MetaWeather", request);
+    expect(forecast).toEqual(expectedMetaWeatherForecast);
+  });
 
 
-  // TODO: test it with inversifyTS
+  // TODO: with inversifyTS
 });

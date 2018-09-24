@@ -1,4 +1,12 @@
-import fetch from "node-fetch";
+import fetch, { Response } from "node-fetch";
+
+export type Request = (url: string) => Promise<any>;
+
+export const defaultRequest: Request = async (url: string) => {
+  const resp: Response = await fetch(url);
+  const json = await resp.json();
+  return json;
+};
 
 interface IConsolidatedWeather {
   "id": number;
@@ -46,18 +54,3 @@ export interface IForecastResponse {
   "latt_long": string;
   "timezone": string;
 }
-
-export interface ILocationResponse {
-  "title": string[];
-  "location_type": string[];
-  "woeid": number[];
-  "latt_long": string[];
-}
-
-export type ClientRequest = (url: string) => Promise<any>;
-
-export const defaultClientRequest: ClientRequest = async (url: string) => {
-  const resp = await fetch(url);
-  const json = await resp.json();
-  return json;
-};

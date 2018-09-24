@@ -1,5 +1,10 @@
-import { ClientRequest, IForecastResponse } from "./io";
+import { Request } from "./io";
 
-export abstract class Service {
-  public abstract async getForecast(city: string, request: ClientRequest): Promise<IForecastResponse>;
+export interface IService {
+  getForecast(city: string, request: Request): Promise<any>;
 }
+
+// export abstract class Service {
+//   public abstract getServiceName(): string;
+//   public abstract async getForecast(city: string, request: Request): Promise<any>;
+// }

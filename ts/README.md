@@ -1,11 +1,11 @@
 
 # Table of Contents
 
-1.  [Get geo location by IP](#org328d8a3)
-2.  [Ger forecast for city](#orga030c9d)
+1.  [Get geo location by IP](#orga4b560e)
+2.  [Ger forecast for city](#org9ba7280)
 
 
-<a id="org328d8a3"></a>
+<a id="orga4b560e"></a>
 
 # Get geo location by IP
 
@@ -14,7 +14,7 @@
     console.log(response.city);
 
 
-<a id="orga030c9d"></a>
+<a id="org9ba7280"></a>
 
 # Ger forecast for city
 
@@ -33,13 +33,33 @@
     const forecast3 = await weather.getForecast("barcelona");
     console.log(forecast3.consolidated_weather);
 
+    // Add new service
+    class OpenWeatherMap implements IService {
+      public static serviceName: string = "OpenWeatherMap";
+
+      public async getForecast(city: string, request: Request): Promise<any> {
+        const appID = "8e3e3073408dd6ddd936d1e148e2f986";
+        const apiURL = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${appID}`;
+        const forecast = await request(apiURL);
+        return forecast;
+      }
+    }
+
+    const services = {
+      [OpenWeatherMap.serviceName]: () => new OpenWeatherMap()
+    };
+
+    const weather = new Weather(services);
+    const forecast3 = await weather.getForecast(city, "OpenWeatherMap");
+
 -   TODO:
-    1.  get forecast with default service
-    2.  add new service from outside
-    3.  Add DI tests
-    4.  make CLI interface
-    5.  <del>make conversion to general IForecastResponse from other services's response formats</del>
-        remove IForecastResponse, use json string or any.
-        weather.getForecast("asdf", "servicename") -&#x2014;> json string
-        because different services may have different formats
-    6.  use defferent weather services
+
+    <del>1. get forecast with default service</del>
+    <del>2. add new service from outside</del>
+    <del>3. Add DI tests</del>
+
+    1.  add Inversify
+    2.  make CLI interface
+    3.  <del>make conversion to general IForecastResponse from other services's response formats</del>
+
+    <del>7. use defferent weather services</del>
